@@ -10,10 +10,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class jdbcSQLite {
-    /**
-     * TODO: verify it's working then refac this code
-     * @author sqlitetutorial.net
-     */
     public static void createDB(String path, String fileName) {
         Path filePath = Paths.get(Paths.get(System.getProperty("user.dir")).toString(),path, fileName);
         Timestamp ts = new Timestamp(System.currentTimeMillis());

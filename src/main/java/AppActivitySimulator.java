@@ -3,38 +3,18 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import mysql.jdbcMySQL;
+import mysql.JDBC;
 
-import static mysql.ParseData.*;
-
-/**
- * reads a csv file, then stream it to a mysql db
- * https://stackabuse.com/reading-and-writing-csvs-in-java/
- *
- */
 public class AppActivitySimulator {
-    /**
-     *
-     * @param pathToCsv
-     * @param sleepTime in seconds
-     * @throws IOException
-     * @throws InterruptedException
-     */
     public void processCSV(String tableName, String pathToCsv, int sleepTime) throws IOException, InterruptedException {
-        jdbcMySQL jdbc=new jdbcMySQL();
+        JDBC jdbc=new JDBC();
 
         createTableInDB(tableName, pathToCsv, jdbc);
 
         streamCSVtoDB(pathToCsv, sleepTime, jdbc, tableName);
     }
 
-    /**
-     * create table based off CSV schema compatibility.
-     * @param pathToCsv
-     * @param jdbc
-     * @return
-     */
-    private void createTableInDB(String tableName, String pathToCsv, jdbcMySQL jdbc){
+    private void createTableInDB(String tableName, String pathToCsv, JDBC jdbc){
         BufferedReader csvReader = null;
         try {
             csvReader = new BufferedReader(new FileReader(pathToCsv));
@@ -59,7 +39,7 @@ public class AppActivitySimulator {
     }
 
 
-    private void streamCSVtoDB(String pathToCsv, int sleepTime, jdbcMySQL jdbc, String tableName) throws IOException, InterruptedException {
+    private void streamCSVtoDB(String pathToCsv, int sleepTime, JDBC jdbc, String tableName) throws IOException, InterruptedException {
         BufferedReader csvReader;
         String row;
         // restarting from the 0 row

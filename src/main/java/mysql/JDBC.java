@@ -1,12 +1,9 @@
 package mysql;
 
 import java.sql.*;
-
 import static mysql.ParseData.parseColumn;
 
-
-public class jdbcMySQL {
-
+public class JDBC {
     Connection conn;
     Statement stmt;
     ResultSet rs;
@@ -41,101 +38,12 @@ public class jdbcMySQL {
             rs.close();
             conn.close();
         } catch (SQLException e) {
-//            e.printStackTrace();
+            System.err.println(e.getMessage());
         } catch (NullPointerException e){
+            System.out.println(e.getMessage());
         }
     }
 
-    public void selectUser() {
-        try {
-            stmt = conn.createStatement();
-            String query = "SELECT * FROM USERS";
-            rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                System.out.println(rs.getString("username") + " " +
-                        rs.getString("password"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void insertUser() {
-        try {
-            stmt = conn.createStatement();
-            String insert = "INSERT INTO users (ID, username,password) values " +
-                    "(1004, 'newUser','newPass')";
-            int rowCount = stmt.executeUpdate(insert);
-            System.out.println("row Count = " + rowCount);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteUser() {
-        try {
-            stmt = conn.createStatement();
-            String delete = "DELETE FROM users WHERE username = 'newUser'";
-            int rowCount = stmt.executeUpdate(delete);
-            System.out.println("row Count = " + rowCount);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void validateLogin(String username, String password) {
-        try {
-            stmt = conn.createStatement();
-            String query = "SELECT * FROM users WHERE username = '" + username
-                    + "' and password ='" + password + "'";
-            rs = stmt.executeQuery(query);
-            if (rs.next()) {
-                System.out.println("User is logged in");
-            } else {
-                System.out.println("Invalid Username and Password");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void selectUserPreparedStatement() {
-        try {
-            String query = "SELECT * FROM users where username= ? and password =?";
-            PreparedStatement pStat = conn.prepareStatement(query);
-            pStat.setString(1, "Jackson");
-            pStat.setString(2, "123456");
-            rs = pStat.executeQuery();
-            while (rs.next()) {
-                System.out.println(rs.getString("username") + " " +
-                        rs.getString("password"));
-            }
-            pStat.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void insertUserPreparedStatement() {
-        try {
-            String query = "INSERT INTO users (ID,username, password) values" +
-                    "(?,?,?)";
-            PreparedStatement pStat = conn.prepareStatement(query);
-            pStat.setInt(1, 1004);
-            pStat.setString(2, "newUser");
-            pStat.setString(3, "newPass");
-            int rowCount = pStat.executeUpdate();
-            System.out.println("row Count = " + rowCount);
-            pStat.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * drop schema if exists, then re-create it
-     * @param schemaName
-     */
     public void flushSchema(String schemaName){
         try (Statement stmt = conn.createStatement()) {
             String sql = "drop schema if exists " + schemaName + ";";
@@ -182,7 +90,7 @@ public class jdbcMySQL {
                     sqlSB.append(row[i]);
                     break;
                 default:
-                    sqlSB.append("\'"+row[i]+"\'");
+                    sqlSB.append("'" +row[i]+ "'");
                     break;
             }
             if (i+1< row.length)
@@ -195,22 +103,14 @@ public class jdbcMySQL {
 
     public void createTable(String[] headerRow, String[] firstRow, String tableName) {
         String sqlCreateTable= sqlPrepareAutoTableCreation(headerRow, firstRow, tableName);
-        jdbcMySQL jdbc=new jdbcMySQL();
+        JDBC jdbc=new JDBC();
         jdbc.connectDB("localhost:3306","mysql","testadmin", "passw0rd");
         jdbc.query("use stream_dev_schema;");
         jdbc.query("drop table if exists `monroe-county-crash-data2003-to-2015`;");
-//        System.out.print(sqlCreateTable);
         jdbc.query(sqlCreateTable);
         jdbc.close();
     }
 
-    /**
-     * use the first row and header row to create table
-     * @param headerRow
-     * @param firstRow
-     * @param table_name
-     * @return
-     */
     public static String sqlPrepareAutoTableCreation(String[] headerRow, String[] firstRow, String table_name){
         StringBuilder sqlSB = new StringBuilder();
         sqlSB.append("create table " +
@@ -225,13 +125,7 @@ public class jdbcMySQL {
             }
         }
         sqlSB.append("\n" + ");");
-//        System.out.print(sqlSB.toString());
         return sqlSB.toString();
-    }
-
-    public static void main(String[] args) {
-//        MyJDBCApp app = new MyJDBCApp();
-//        app.initializeConnection();
     }
 
 }
